@@ -18,7 +18,11 @@ import { UserValidation } from "@/lib/validations/user";
 import Image from "next/image";
 import { ChangeEvent, useState } from "react";
 import { isBase64Image } from "@/lib/utils";
-import {useUploadThing} from "@/lib/uploadthing";
+import { useUploadThing } from "@/lib/uploadthing";
+import { updateUser } from "@/lib/actions/user.actions";
+import { usePathname , useRouter } from "next/navigation";
+
+
 
 interface Props {
   user: {
@@ -33,12 +37,19 @@ interface Props {
 }
 
 const AccountProfile = ({ user, btnTitle }: Props) => {
-  const {startUpload} = useUploadThing("media");
+  const pathname = usePathname();
+  const router = useRouter();
+  const { startUpload } = useUploadThing("media");
   const [files, setFiles] = useState<File[]>([]);
-  
+
   const form = useForm({
     resolver: zodResolver(UserValidation),
-    defaultValues: { profile_photo: user?.image||"", name: user?.name||"", username: user?.username||"", bio: user?.bio||"" },
+    defaultValues: {
+      profile_photo: user?.image || "",
+      name: user?.name || "",
+      username: user?.username || "",
+      bio: user?.bio || "",
+    },
   });
 
   const handleImage = (
@@ -47,14 +58,14 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   ) => {
     e.preventDefault();
     const fileReader = new FileReader();
-    if(e.target.files?.length){
-      const file = e.target.files[0] ;
+    if (e.target.files?.length) {
+      const file = e.target.files[0];
       setFiles(Array.from(e.target.files));
-      if(!file.type.includes('image')) return;
-      fileReader.onload = async(event) => {
-        const imageDataUrl = event?.target?.result?.toString() || '';
+      if (!file.type.includes("image")) return;
+      fileReader.onload = async (event) => {
+        const imageDataUrl = event?.target?.result?.toString() || "";
         fieldChange(imageDataUrl);
-      }
+      };
       fileReader.readAsDataURL(file);
     }
   };
@@ -62,14 +73,27 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     const blob = values.profile_photo;
     const hasImageChanged = isBase64Image(blob);
 
-    if(hasImageChanged){
+    if (hasImageChanged) {
       const imageRes = await startUpload(files);
-      if(imageRes && imageRes[0].fileUrl){
+      if (imageRes && imageRes[0].fileUrl) {
         values.profile_photo = imageRes[0].fileUrl;
       }
     }
 
-    //todo: update user profile
+    await updateUser({
+      userId:user.id,
+      username: values.username,
+      name: values.name,
+      bio: values.bio,
+      image: values.profile_photo,
+      path: pathname,
+    });
+
+    if(pathname === '/profile/edit'){
+      router.back();
+    }else{
+      router.push('/');
+    }
   }
 
   return (

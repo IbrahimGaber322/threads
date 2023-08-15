@@ -1,17 +1,26 @@
 import AccountProfile from "@/components/forms/AccountProfile";
 
 import { currentUser } from "@clerk/nextjs";
+import { StringExpressionOperatorReturningArray } from "mongoose";
 
 async function page() {
   const user = await currentUser();
-  const userInfo = {};
-  const userData = {
-    id: user?.id,
-    obectId: userInfo?._id,
-    username: userInfo?.username || user?.username,
-    name: userInfo?.name || user?.firstName || "",
-    bio: userInfo?.bio || "",
-    image: userInfo?.image || user?.imageUrl,
+  const userInfo:{_id:string, username:string, name:string, bio:string, image:string} = {_id:"string", username:"string", name:"string", bio:"string", image:"string"};
+ interface userDataTypes  {
+    id: string;
+    objectId: string;
+    username: string;
+    name: string;
+    bio: string;
+    image: string;
+  }
+  const userData:userDataTypes = {
+    id: user?.id || "",
+    objectId: userInfo?._id,
+    username: userInfo?.username || user?.username || "",
+    name: userInfo?.name || user?.firstName ||"",
+    bio: userInfo?.bio,
+    image: userInfo?.image || user?.imageUrl || "",
   };
 
   return (

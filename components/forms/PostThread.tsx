@@ -40,7 +40,7 @@ function PostThread({ props }: Props){
     });
 
     const onSubmit = async(values:z.infer<typeof ThreadValidation>) =>{
-         createThread({text:values.thread, author:userId, communityId:null, path:pathname});
+         await createThread({text:values.thread, author:userId, communityId:null, path:pathname});
          router.push('/');
     }
          

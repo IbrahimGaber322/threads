@@ -19,7 +19,7 @@ export default async function Home() {
         ) : (
           threads?.map((thread: any) => (
             <ThreadCard
-              key={thread._id}
+              key={thread._id}  
               id={thread._id}
               currentUserId={user?.id || ""}
               parentId={thread.parentId}

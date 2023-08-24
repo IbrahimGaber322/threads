@@ -16,7 +16,7 @@ async function page() {
   return (
     <>
       <h1 className="head-text">Create Thread</h1>
-      <PostThread props={{ userId }} />
+      <PostThread userId={userId} />
     </>
   );
 }

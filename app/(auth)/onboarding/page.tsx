@@ -1,26 +1,31 @@
 import AccountProfile from "@/components/forms/AccountProfile";
+import { fetchUser } from "@/lib/actions/user.actions";
 
 import { currentUser } from "@clerk/nextjs";
 import { StringExpressionOperatorReturningArray } from "mongoose";
+import { redirect } from "next/navigation";
 
 async function page() {
   const user = await currentUser();
-  const userInfo:{_id:string, username:string, name:string, bio:string, image:string} = {_id:"string", username:"string", name:"string", bio:"string", image:"string"};
- interface userDataTypes  {
+  if (!user) redirect("/sign-in");
+
+  const userInfo = await fetchUser(user?.id);
+  if (userInfo?.onboarded) redirect("/");
+  interface userDataTypes {
     id: string;
-    objectId: string;
     username: string;
     name: string;
     bio: string;
     image: string;
+    objectId: string;
   }
-  const userData:userDataTypes = {
+  const userData: userDataTypes = {
     id: user?.id || "",
-    objectId: userInfo?._id,
     username: userInfo?.username || user?.username || "",
-    name: userInfo?.name || user?.firstName ||"",
-    bio: userInfo?.bio,
+    name: userInfo?.name || user?.firstName || "",
+    bio: userInfo?.bio || "",
     image: userInfo?.image || user?.imageUrl || "",
+    objectId: userInfo?._id || "",
   };
 
   return (

@@ -27,7 +27,6 @@ import { usePathname , useRouter } from "next/navigation";
 interface Props {
   user: {
     id: string;
-    objectId: string;
     username: string;
     name: string;
     bio: string;
@@ -51,7 +50,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
       bio: user?.bio || "",
     },
   });
-
+ 
   const handleImage = (
     e: ChangeEvent<HTMLInputElement>,
     fieldChange: (value: string) => void
@@ -60,7 +59,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     const fileReader = new FileReader();
     if (e.target.files?.length) {
       const file = e.target.files[0];
-      setFiles(Array.from(e.target.files));
+      setFiles(Array.from(e.target?.files));
       if (!file.type.includes("image")) return;
       fileReader.onload = async (event) => {
         const imageDataUrl = event?.target?.result?.toString() || "";
@@ -70,7 +69,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     }
   };
   async function onSubmit(values: z.infer<typeof UserValidation>) {
-    const blob = values.profile_photo;
+    const blob = values?.profile_photo;
     const hasImageChanged = isBase64Image(blob);
 
     if (hasImageChanged) {
@@ -82,10 +81,10 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
 
     await updateUser({
       userId:user.id,
-      username: values.username,
-      name: values.name,
-      bio: values.bio,
-      image: values.profile_photo,
+      username: values?.username,
+      name: values?.name,
+      bio: values?.bio,
+      image: values?.profile_photo,
       path: pathname,
     });
 
@@ -108,7 +107,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
           render={({ field }) => (
             <FormItem className="flex items-center gap-4">
               <FormLabel className="account-form_image-label">
-                {field.value ? (
+                {field.value?.length>0 ? (
                   <Image
                     alt="profile photo"
                     src={field.value}
